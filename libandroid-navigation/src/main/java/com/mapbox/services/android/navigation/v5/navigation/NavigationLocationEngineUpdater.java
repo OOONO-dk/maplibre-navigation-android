@@ -51,7 +51,10 @@ class NavigationLocationEngineUpdater {
                 Location location = result.getLastLocation();
                 if (!listener.isValidLocationUpdate(location)) {
                     routeUtils = obtainRouteUtils();
-                    location = routeUtils.createFirstLocationFromRoute(route);
+                    Location tmpLocation = routeUtils.createFirstLocationFromRoute(route);
+                    if(tmpLocation != null){
+                        location = tmpLocation;
+                    }
                 }
                 listener.queueLocationUpdate(location);
             }

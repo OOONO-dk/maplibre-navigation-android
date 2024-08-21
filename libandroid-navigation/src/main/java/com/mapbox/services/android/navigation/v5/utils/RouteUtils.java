@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class RouteUtils {
@@ -181,13 +182,29 @@ public class RouteUtils {
    * @return {@link Location} from first coordinate
    * @since 0.10.0
    */
+  @Nullable
   public Location createFirstLocationFromRoute(DirectionsRoute route) {
-    List<Point> coordinates = route.routeOptions().coordinates();
-    Point origin = coordinates.get(FIRST_COORDINATE);
-    Location forcedLocation = new Location(FORCED_LOCATION);
-    forcedLocation.setLatitude(origin.latitude());
-    forcedLocation.setLongitude(origin.longitude());
-    return forcedLocation;
+    if(route.routeOptions() != null) {
+      List<Point> coordinates = route.routeOptions().coordinates();
+      Point origin = coordinates.get(FIRST_COORDINATE);
+      Location forcedLocation = new Location(FORCED_LOCATION);
+      forcedLocation.setLatitude(origin.latitude());
+      forcedLocation.setLongitude(origin.longitude());
+      return forcedLocation;
+    } else {
+      if(route.legs() != null){
+        List<RouteLeg> legs = route.legs();
+        RouteLeg firstLeg = legs.get(FIRST_COORDINATE);
+        Location forcedLocation = new Location(FORCED_LOCATION);
+        if(firstLeg.steps() != null){
+          LegStep firstStep = firstLeg.steps().get(FIRST_COORDINATE);
+          forcedLocation.setLatitude(firstStep.maneuver().location().latitude());
+          forcedLocation.setLongitude(firstStep.maneuver().location().longitude());
+          return forcedLocation;
+        }
+      }
+      return null;
+    }
   }
 
   /**
